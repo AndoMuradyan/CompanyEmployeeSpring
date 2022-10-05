@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Company</title>
+</head>
+<body>
+
+<form action="/users/add" method="post" enctype="multipart/form-data">
+    <input type="text" name="name" placeholder="name"><br>
+    <input type="text" name="surname" placeholder="surname"><br>
+    <input type="email" name="email" placeholder="email"><br th:if="${errorMassageEmail!=null}">
+    <span style="color: red" th:if="${errorMassageEmail != null}" th:text="${errorMassageEmail}"></span>
+    <input type="password" name="password"><br>
+    <label for="userImage">user</label>
+    <input type="file" name="userImage" id="userImage" accept="image/*"><br th:if="${errorMassageFile!=null}">
+    <span style="color: red" th:if="${errorMassageFile != null}" th:text="${errorMassageFile}"></span>
+
+    <select name="role" id="role">
+        <option value="ADMIN">admin</option>
+        <option value="USER">user</option>
+    </select>
+    <input type="submit" value="Add Company"><br>
+</form>
+</body>
+</html>

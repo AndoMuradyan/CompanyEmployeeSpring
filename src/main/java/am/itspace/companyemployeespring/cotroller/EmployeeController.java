@@ -2,12 +2,15 @@ package am.itspace.companyemployeespring.cotroller;
 
 import am.itspace.companyemployeespring.entity.Company;
 import am.itspace.companyemployeespring.entity.Employee;
+import am.itspace.companyemployeespring.entity.Role;
 import am.itspace.companyemployeespring.repository.CompanyRepository;
 import am.itspace.companyemployeespring.repository.EmployeeRepository;
+import am.itspace.companyemployeespring.security.CurrentUser;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +43,7 @@ public class EmployeeController {
     public String addEmployees(@ModelAttribute Employee employee,
                                @RequestParam("employeeImage") MultipartFile file) throws IOException {
         if (!file.isEmpty() && file.getSize() > 0) {
+
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             File newFile = new File(folderrPath + File.separator + fileName);
             file.transferTo(newFile);
@@ -54,8 +58,12 @@ public class EmployeeController {
     }
 
     @GetMapping("/employee")
-    public String employee(ModelMap modelMap) {
-        List<Employee> employees = employeeRepository.findAll();
+    public String employee(ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
+        Role role = currentUser.getUser().getRole();
+        List<Employee> employees = role == Role.USER ?
+                employeeRepository.findAllByCompany_Id(currentUser.getUser().getId()) :
+                employeeRepository.findAll();
+
         modelMap.addAttribute("employees", employees);
         return "employee";
     }
@@ -68,9 +76,9 @@ public class EmployeeController {
 
     @GetMapping("/employee/delete")
     public String delete(@ModelAttribute Employee employee, @RequestParam("id") int id) {
-        Optional<Employee> byId =employeeRepository.findById(id);
+        Optional<Employee> byId = employeeRepository.findById(id);
         Company company = byId.get().getCompany();
-        company.setSize(company.getSize()-1);
+        company.setSize(company.getSize() - 1);
         employeeRepository.deleteById(id);
         return "redirect:/employee";
     }

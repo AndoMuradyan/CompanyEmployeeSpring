@@ -18,11 +18,10 @@ public class CompanyController {
 
     @Autowired
     private CompanyRepository companyRepository;
-    @Autowired
-    private EmployeeRepository employeeRepository;
+
 
     @GetMapping("/company/add")
-    public String companys(ModelMap modelMap) {
+    public String addCompany() {
         return "addCompany";
     }
 
